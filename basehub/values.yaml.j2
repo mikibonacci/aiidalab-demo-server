@@ -9,9 +9,9 @@ jupyterhub:
                 contactEmail: aiidalab@materialscloud.org
     singleuser:
         image:
-            name: ghcr.io/aiidalab/qe
-            tag: v24.10.0a7
-            pullPolicy: Always
+            name: aiidalab/full-stack # ghcr.io/aiidalab/qe
+            tag: latest # v24.10.0a7
+            pullPolicy: IfNotPresent
         cmd:
             - start-singleuser.sh
         extraEnv:
@@ -45,6 +45,12 @@ jupyterhub:
                 - mountPath: /etc/jupyter
                   name: etc-jupyter
     hub:
+        readinessProbe:
+            enabled: true
+            initialDelaySeconds: 5  # Increase delay to allow Hub to start
+            periodSeconds: 10        # Frequency of the probe check
+            failureThreshold: 5      # Allow 5 failures before marking unhealthy
+            timeoutSeconds: 5        # Timeout for the probe check
         db:
             pvc:
                 storageClassName: default
@@ -95,8 +101,15 @@ jupyterhub:
                 client_id: {{ environ('OAUTH_CLIENT_ID') }}
                 client_secret: {{ environ('OAUTH_CLIENT_SECRET') }}
                 oauth_callback_url: {{ environ('OAUTH_CALLBACK_URL') }}
-                allow_all: true
+                allow_users:
+                    - mikibonacci
+                    - edan-bainglass
+                    - superstar54
+                    - unkcpz
                 #allowed_organizations: ['aiidalab']
                 admin_users:
+                    - mikibonacci
+                    - edan-bainglass
+                    - superstar54
                     - unkcpz
-                    - yakutovicha
+
