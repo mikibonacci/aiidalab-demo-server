@@ -1,0 +1,55 @@
+INSTALL GRAFANA AND PROMETHEUS 
+PROMETHEUS is the data source which pull metrics from the kubernetes cluster.
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
+
+kubectl apply -f service-monitor.yaml
+kubectl port-forward svc/my-grafana 3000:80 -n monitoring
+
+Useful dashoboard:
+import 6417
+
+USEFULE QUETIES:
+
+rate(container_cpu_usage_seconds_total{namespace=~"$namespace", container="notebook"}[$__rate_interval])
+container_memory_usage_bytes{namespace=~"$namespace", container="notebook"}
+----------------------------------------------------------------------------------------------------------------
+
+INSTALL GRAFANA: (HELM:https://grafana.com/docs/grafana/latest/setup-grafana/installation/helm/)
+
+RUNNING: helm get notes my-grafana -n monitoring
+
+bonacc_m@mpc3129:~/aiidalab-demo-server$ helm install my-grafana grafana/grafana --namespace monitoring
+NAME: my-grafana
+LAST DEPLOYED: Wed Apr  2 10:42:13 2025
+NAMESPACE: monitoring
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Get your 'admin' user password by running:
+
+   kubectl get secret --namespace monitoring my-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+
+2. The Grafana server can be accessed via port 80 on the following DNS name from within your cluster:
+
+   my-grafana.monitoring.svc.cluster.local
+
+   Get the Grafana URL to visit by running these commands in the same shell:
+     export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=my-grafana" -o jsonpath="{.items[0].metadata.name}")
+     kubectl --namespace monitoring port-forward $POD_NAME 3000
+
+3. Login with the password from step 1 and the username: admin
+#################################################################################
+######   WARNING: Persistence is disabled!!! You will lose your data when   #####
+######            the Grafana pod is terminated.                            #####
+#################################################################################
+bonacc_m@mpc3129:~/aiidalab-demo-server$ helm list -n monitoring
+NAME            NAMESPACE       REVISION        UPDATED                                         STATUS          CHART           APP VERSION
+my-grafana      monitoring      1               2025-04-02 10:42:13.944775026 +0200 CEST        deployed        grafana-8.11.1  11.6.0     
+bonacc_m@mpc3129:~/aiidalab-demo-server$ kubectl get secret --namespace monitoring my-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+Yc4Os4vjEALslQqgNGtLv0kOj6bho1ySZD14nTFg
+bonacc_m@mpc3129:~/aiidalab-demo-server$ export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=my-grafana" -o jsonpath="{.items[0].metadata.name}")
+bonacc_m@mpc3129:~/aiidalab-demo-server$ kubectl --namespace monitoring port-forward $POD_NAME 3000

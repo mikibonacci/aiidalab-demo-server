@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: my-app-monitor
+  namespace: monitoring  # This is where Prometheus is installed
+  labels:
+    release: prometheus  # Ensure this matches your Prometheus Helm release name
+spec:
+  selector:
+    matchExpressions: []  # Empty means all applications
+  namespaceSelector:
+    matchNames:
+      - staging  # This is the application namespace you want to monitor
+  endpoints:
+    - port: metrics  # Ensure this matches the port exposing metrics
+      path: /metrics
+      interval: 15s
