@@ -2,30 +2,32 @@
 jupyterhub:
     proxy:
         https:
-            enabled: true
+            enabled: true # set false at the beginning . put enable once the dns is there (also in the github app) and linked with the IP
             hosts:
-                - {{ 'staging-demo' if environ('K8S_NAMESPACE')=='staging' else 'demo' }}.aiidalab.io
+                - psi-tutorial-staging.aiidalab.io
             letsencrypt:
                 contactEmail: aiidalab@materialscloud.org
     singleuser:
         image:
-            name: aiidalab/full-stack # ghcr.io/aiidalab/qe
-            tag: latest # v24.10.0a7
+            name: aiidalab/qe # ghcr.io/aiidalab/qe
+            tag: latest # pr-1233
             pullPolicy: IfNotPresent
         cmd:
             - start-singleuser.sh
+        #nodeSelector: # ensure that the pods are scheduled on the correct node pool, i.e. "users"
+        #    agentpool: users8cpusv5
         extraEnv:
             JUPYTERHUB_SINGLEUSER_APP: notebook.notebookapp.NotebookApp
         cpu:
             guarantee: 1.5
-            limit: 1.5
+            limit: 2
         memory:
-            guarantee: 5G
-            limit: 5G
+            guarantee: 6G
+            limit: 6G
         storage:
             homeMountPath: /home/jovyan
             dynamic:
-                storageClass: default
+                storageClass: userpool-storage
             capacity: 50Gi
             extraVolumes:
                 - name: hub-templates
@@ -51,9 +53,11 @@ jupyterhub:
             periodSeconds: 10        # Frequency of the probe check
             failureThreshold: 5      # Allow 5 failures before marking unhealthy
             timeoutSeconds: 5        # Timeout for the probe check
+        #nodeSelector:
+        #    agentpool: users8cpusv5
         db:
             pvc:
-                storageClassName: default
+                storageClassName: userpool-storage
                 storage: 1Gi
         extraConfig:
             00-logo: |
@@ -77,11 +81,11 @@ jupyterhub:
                     (r"about", AboutHandler),
                     (r"faq", FAQHandler),
                 ])
-            20-announce: |
-                c.JupyterHub.template_vars = {
-                    'announcement_login': 'The site is in beta testing. Please report any issue you might encounter in the <a href="https://github.com/unkcpz/aiidalab-demo-server/issues/new">AiiDAlab Demo GitHub repository</a>.',
-                    'announcement': 'The site is in beta testing. Use it at your own risk.',
-                }
+            #20-announce: |
+            #    c.JupyterHub.template_vars = {
+            #        'announcement_login': 'The site is in beta testing. Please report any issue you might encounter in the <a href="https://github.com/unkcpz/aiidalab-demo-server/issues/new">AiiDAlab Demo GitHub repository</a>.',
+            #        'announcement': 'The site is in beta testing. Use it at your own risk.',
+            #    }
         extraVolumes:
             - name: hub-templates
               configMap:
@@ -98,18 +102,25 @@ jupyterhub:
             JupyterHub:
                 authenticator_class: 'github'
             GitHubOAuthenticator:
-                client_id: {{ environ('OAUTH_CLIENT_ID') }}
-                client_secret: {{ environ('OAUTH_CLIENT_SECRET') }}
-                oauth_callback_url: {{ environ('OAUTH_CALLBACK_URL') }}
+                client_id: Ov23ctkCdImzUrxDVq2y
+                client_secret: d95d18337537d405f98e55e2db0a6a484d5fbc44
+                oauth_callback_url: https://psi-tutorial-staging.aiidalab.io/hub/oauth_callback
+                #allow_all: true
                 allow_users:
                     - mikibonacci
-                    - edan-bainglass
                     - superstar54
                     - unkcpz
+                    - edan-bainglass
+                    - giovannipizzi
+                    - t-reents
+                    - AndresOrtegaGuerrero
                 #allowed_organizations: ['aiidalab']
+                allow_existing_users: true
                 admin_users:
                     - mikibonacci
-                    - edan-bainglass
                     - superstar54
                     - unkcpz
-
+                    - edan-bainglass
+                    - giovannipizzi
+                    - t-reents
+                    - AndresOrtegaGuerrero

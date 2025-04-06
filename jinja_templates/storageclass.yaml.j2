@@ -1,7 +1,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: userpool-storage-production
+  name: userpool-storage{{ '' if environ('K8S_NAMESPACE')=='staging' else '-production' }}
 provisioner: disk.csi.azure.com
 parameters:
   skuName: StandardSSD_LRS

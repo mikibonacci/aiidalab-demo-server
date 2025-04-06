@@ -890,6 +890,10 @@ grafana.ini:
   #   enabled: true
   #   allow_sign_up: true
   #   config_file: /etc/grafana/ldap.toml
+## Grafana's alerting configuration
+  # unified_alerting:
+  #   enabled: true
+  #   rule_version_record_limit: "5"
 
 ## Grafana's LDAP configuration
 ## Templated by the template in _helpers.tpl
@@ -1020,7 +1024,7 @@ sidecar:
     # Sets the size limit of the alert sidecar emptyDir volume
     sizeLimit: {}
   dashboards:
-    enabled: true
+    enabled: false
     # Additional environment variables for the dashboards sidecar
     env: {}
     ## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
@@ -1042,24 +1046,24 @@ sidecar:
     # label that the configmaps with dashboards are marked with (can be templated)
     label: grafana_dashboard
     # value of label that the configmaps with dashboards are set to (can be templated)
-    labelValue: "1"
+    labelValue: ""
     # Log level. Can be one of: DEBUG, INFO, WARN, ERROR, CRITICAL.
     # logLevel: INFO
     # folder in the pod that should hold the collected dashboards (unless `defaultFolderName` is set)
     folder: /tmp/dashboards
     # The default folder name, it will create a subfolder under the `folder` and put dashboards in there instead
-    defaultFolderName: "General"
+    defaultFolderName: null
     # Namespaces list. If specified, the sidecar will search for config-maps/secrets inside these namespaces.
     # Otherwise the namespace in which the sidecar is running will be used.
     # It's also possible to specify ALL to search in all namespaces.
-    searchNamespace: ALL
+    searchNamespace: null
     # Method to use to detect ConfigMap changes. With WATCH the sidecar will do a WATCH requests, with SLEEP it will list all ConfigMaps, then sleep for 60 seconds.
     watchMethod: WATCH
     # search in configmap, secret or both
     resource: both
     # If specified, the sidecar will look for annotation with this name to create folder and put graph here.
     # You can use this parameter together with `provider.foldersFromFilesStructure`to annotate configmaps and create folder structure.
-    folderAnnotation: grafana_folder
+    folderAnnotation: null
     #
     # maxTotalRetries: Total number of retries to allow for any http request.
     # Takes precedence over other counts. Applies to all requests to reloadURL and k8s api requests.
@@ -1110,7 +1114,7 @@ sidecar:
       # allow updating provisioned dashboards from the UI
       allowUiUpdates: false
       # allow Grafana to replicate dashboard structure from filesystem
-      foldersFromFilesStructure: true
+      foldersFromFilesStructure: false
     # Additional dashboards sidecar volume mounts
     extraMounts: []
     # Sets the size limit of the dashboard sidecar emptyDir volume

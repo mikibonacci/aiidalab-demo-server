@@ -9,8 +9,7 @@ spec:
   selector:
     matchExpressions: []  # Empty means all applications
   namespaceSelector:
-    matchNames:
-      - staging  # This is the application namespace you want to monitor
+    matchNames: []
   endpoints:
     - port: metrics  # Ensure this matches the port exposing metrics
       path: /metrics
