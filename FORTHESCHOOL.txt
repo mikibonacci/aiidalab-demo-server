@@ -1,2 +1,0 @@
-- before they start, like 12 hours before, set as min nodes enough nodes to host all the in person, so we don't need to scale (it just slow things down). 
-- divide the users for the VMs.

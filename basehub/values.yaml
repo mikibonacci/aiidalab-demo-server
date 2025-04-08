@@ -12,8 +12,13 @@ jupyterhub:
             name: aiidalab/qe # ghcr.io/aiidalab/qe
             tag: latest # v24.10.0a7
             pullPolicy: IfNotPresent
-        #nodeSelector: # ensure that the pods are scheduled on the correct node pool, i.e. "users"
-        #    agentpool: users8cpusv5
+        #nodeSelector: # ensure that the pods are scheduled on the correct node pool, i.e. "users8cpusv5"
+        #    agentpool: usersvm
+        #extraTolerations: # combined with taint of the node pool, this ensures that the pods are scheduled on the correct node pool
+        #    - key: "nodepool"
+        #      operator: "Equal"
+        #      value: "usersvm"
+        #      effect: "NoExecute"
         cmd:
             - start-singleuser.sh
         extraEnv:
@@ -65,13 +70,20 @@ jupyterhub:
             01-allowed_users: |
                 # read yaml file with allowed users
 
+                import logging
                 import yaml
+
+                # Configure logging
+                logging.basicConfig(level=logging.INFO)
+                logger = logging.getLogger(__name__)
                 
                 allowed_users_list = '/etc/jupyterhub/allowed_users_list.yaml'
                 with open(allowed_users_list, 'r') as f:
                     allowed_users = yaml.safe_load(f)
                     
                 c.Authenticator.allowed_users = allowed_users['allowed_users']
+
+                logger.info(f"allowed_users: {c.Authenticator.allowed_users}")
             02-spawner: |
                 c.KubeSpawner.http_timeout = 300
             03-templates: |
@@ -123,9 +135,9 @@ jupyterhub:
                 client_secret: 0e4b7a5381ddfe1e744232df59fef19c09a85605 #None
                 oauth_callback_url: https://psi-tutorial.aiidalab.io/hub/oauth_callback
                 #allow_all: true
-                allowed_users: []
+                #allowed_users: [] # do not set this, otherwise it will override the allowed_users_list.yaml file
                 #allowed_organizations: ['aiidalab']
-                allow_existing_users: false
+                allow_existing_users: true
                 admin_users:
                     - superstar54
                     - unkcpz

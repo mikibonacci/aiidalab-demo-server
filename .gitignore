@@ -1,6 +1,6 @@
 ssh-key-*
 secrets*
 k8s-deploy-venv/*
-vdalues.yaml
+values.yaml
 */Chart.lock
 */charts/*
