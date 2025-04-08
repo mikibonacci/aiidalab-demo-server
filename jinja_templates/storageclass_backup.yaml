@@ -1,17 +1,1 @@
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: userpool-storage
-provisioner: disk.csi.azure.com
-parameters:
-  skuName: StandardSSD_LRS
-  storageaccounttype: StandardSSD_LRS
-  kind: Managed
-volumeBindingMode: WaitForFirstConsumer
-allowVolumeExpansion: false
-reclaimPolicy: Delete
-allowedTopologies:
-  - matchLabelExpressions:
-      - key: topology.kubernetes.io/zone
-        values:
-          - switzerlandnorth-1  # Change to switzerlandnorth-2 or switzerlandnorth-3 
+
