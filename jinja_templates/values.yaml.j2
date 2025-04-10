@@ -11,7 +11,7 @@ jupyterhub:
         image:
             name: aiidalab/qe # ghcr.io/aiidalab/qe
             tag: latest # v24.10.0a7
-            pullPolicy: IfNotPresent
+            pullPolicy: Always # so we take the digest, not only the tag
         #nodeSelector: # ensure that the pods are scheduled on the correct node pool, i.e. "users8cpusv5"
         #    agentpool: usersvm
         #extraTolerations: # combined with taint of the node pool, this ensures that the pods are scheduled on the correct node pool
@@ -67,23 +67,23 @@ jupyterhub:
         extraConfig:
             00-logo: |
                 c.JupyterHub.logo_file = "/usr/local/share/jupyterhub/static/external/aiidalab-wide-logo.png"
-            01-allowed_users: |
-                # read yaml file with allowed users
+            #01-allowed_users: |
+            #    # read yaml file with allowed users
 
-                import logging
-                import yaml
+            #    import logging
+            #    import yaml
 
-                # Configure logging
-                logging.basicConfig(level=logging.INFO)
-                logger = logging.getLogger(__name__)
+            #    # Configure logging
+            #    logging.basicConfig(level=logging.INFO)
+            #    logger = logging.getLogger(__name__)
                 
-                allowed_users_list = '/etc/jupyterhub/allowed_users_list.yaml'
-                with open(allowed_users_list, 'r') as f:
-                    allowed_users = yaml.safe_load(f)
+            #    allowed_users_list = '/etc/jupyterhub/allowed_users_list.yaml'
+            #    with open(allowed_users_list, 'r') as f:
+            #        allowed_users = yaml.safe_load(f)
                     
-                c.Authenticator.allowed_users = allowed_users['allowed_users']
+            #    c.Authenticator.allowed_users = allowed_users['allowed_users']
 
-                logger.info(f"allowed_users: {c.Authenticator.allowed_users}")
+            #    logger.info(f"allowed_users: {c.Authenticator.allowed_users}")
             02-spawner: |
                 c.KubeSpawner.http_timeout = 300
             03-templates: |
@@ -134,7 +134,7 @@ jupyterhub:
                 client_id: {{ environ('OAUTH_CLIENT_ID_STAGING') if environ('K8S_NAMESPACE')=='staging' else environ('OAUTH_CLIENT_ID') }}
                 client_secret: {{ environ('OAUTH_CLIENT_SECRET_STAGING') if environ('K8S_NAMESPACE')=='staging' else environ('OAUTH_CLIENT_SECRET') }}
                 oauth_callback_url: https://psi-tutorial{{ '-staging' if environ('K8S_NAMESPACE')=='staging' else '' }}.aiidalab.io/hub/oauth_callback
-                #allow_all: true
+                allow_all: true
                 #allowed_users: [] # do not set this, otherwise it will override the allowed_users_list.yaml file
                 #allowed_organizations: ['aiidalab']
                 allow_existing_users: true
